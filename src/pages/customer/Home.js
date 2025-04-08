@@ -25,7 +25,7 @@ function CustomerHome() {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-  }, []);
+  }, [fetchProducts]);
 
   const fetchProducts = async () => {
     try {

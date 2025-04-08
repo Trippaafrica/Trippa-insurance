@@ -12,59 +12,80 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Button,
 } from '@mui/material';
 import { supabase } from '../../utils/supabaseClient';
 
-function RiderHome() {
-  const [stats, setStats] = useState({
-    totalOrders: 0,
-    completedOrders: 0,
-    totalEarnings: 0,
-    rating: 0,
+function RiderEarnings() {
+  const [earnings, setEarnings] = useState({
+    today: 0,
+    week: 0,
+    month: 0,
+    total: 0,
   });
-  const [activeOrders, setActiveOrders] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getStats();
-    getActiveOrders();
+    getEarnings();
+    getRecentOrders();
   }, []);
 
-  async function getStats() {
+  async function getEarnings() {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        // Get all orders for the rider
-        const { data: orders, error } = await supabase
+        // Get completed orders
+        const { data, error } = await supabase
           .from('orders')
-          .select('*')
-          .eq('rider_id', user.id);
+          .select('amount, created_at')
+          .eq('rider_id', user.id)
+          .eq('status', 'completed');
 
         if (error) throw error;
 
-        if (orders) {
-          const completedOrders = orders.filter(order => order.status === 'completed');
-          const totalEarnings = completedOrders.reduce((sum, order) => sum + parseFloat(order.amount), 0);
+        if (data) {
+          const now = new Date();
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+          const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
 
-          setStats({
-            totalOrders: orders.length,
-            completedOrders: completedOrders.length,
-            totalEarnings,
-            rating: 4.5, // This should come from a ratings table in a real app
+          const earnings = {
+            today: 0,
+            week: 0,
+            month: 0,
+            total: 0,
+          };
+
+          data.forEach(order => {
+            const orderDate = new Date(order.created_at);
+            const amount = parseFloat(order.amount);
+
+            earnings.total += amount;
+
+            if (orderDate >= today) {
+              earnings.today += amount;
+            }
+            if (orderDate >= weekAgo) {
+              earnings.week += amount;
+            }
+            if (orderDate >= monthAgo) {
+              earnings.month += amount;
+            }
           });
+
+          setEarnings(earnings);
         }
       }
     } catch (error) {
-      console.error('Error loading stats:', error.message);
+      console.error('Error loading earnings:', error.message);
     } finally {
       setLoading(false);
     }
   }
 
-  async function getActiveOrders() {
+  async function getRecentOrders() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -76,44 +97,22 @@ function RiderHome() {
             customer:customer_id(name)
           `)
           .eq('rider_id', user.id)
-          .eq('status', 'in_progress')
-          .order('created_at', { ascending: false });
+          .eq('status', 'completed')
+          .order('created_at', { ascending: false })
+          .limit(10);
 
         if (error) throw error;
-        if (data) setActiveOrders(data);
+        if (data) setRecentOrders(data);
       }
     } catch (error) {
-      console.error('Error loading active orders:', error.message);
-    }
-  }
-
-  async function handleCompleteOrder(orderId) {
-    try {
-      setLoading(true);
-      const { error } = await supabase
-        .from('orders')
-        .update({
-          status: 'completed',
-        })
-        .eq('id', orderId);
-
-      if (error) throw error;
-      
-      // Refresh data
-      getStats();
-      getActiveOrders();
-    } catch (error) {
-      console.error('Error completing order:', error.message);
-      alert('Error completing order');
-    } finally {
-      setLoading(false);
+      console.error('Error loading recent orders:', error.message);
     }
   }
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Welcome Back!
+        Earnings
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -121,10 +120,10 @@ function RiderHome() {
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
-                Total Orders
+                Today's Earnings
               </Typography>
               <Typography variant="h5">
-                {stats.totalOrders}
+                KES {earnings.today.toFixed(2)}
               </Typography>
             </CardContent>
           </Card>
@@ -133,10 +132,22 @@ function RiderHome() {
           <Card>
             <CardContent>
               <Typography color="textSecondary" gutterBottom>
-                Completed Orders
+                This Week
               </Typography>
               <Typography variant="h5">
-                {stats.completedOrders}
+                KES {earnings.week.toFixed(2)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                This Month
+              </Typography>
+              <Typography variant="h5">
+                KES {earnings.month.toFixed(2)}
               </Typography>
             </CardContent>
           </Card>
@@ -148,19 +159,7 @@ function RiderHome() {
                 Total Earnings
               </Typography>
               <Typography variant="h5">
-                KES {stats.totalEarnings.toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Rating
-              </Typography>
-              <Typography variant="h5">
-                {stats.rating.toFixed(1)} / 5.0
+                KES {earnings.total.toFixed(2)}
               </Typography>
             </CardContent>
           </Card>
@@ -168,7 +167,7 @@ function RiderHome() {
       </Grid>
 
       <Typography variant="h6" gutterBottom>
-        Active Orders
+        Recent Orders
       </Typography>
       <TableContainer component={Paper}>
         <Table>
@@ -179,7 +178,7 @@ function RiderHome() {
               <TableCell>Pickup</TableCell>
               <TableCell>Dropoff</TableCell>
               <TableCell>Amount</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>Date</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -187,12 +186,12 @@ function RiderHome() {
               <TableRow>
                 <TableCell colSpan={6} align="center">Loading...</TableCell>
               </TableRow>
-            ) : activeOrders.length === 0 ? (
+            ) : recentOrders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center">No active orders</TableCell>
+                <TableCell colSpan={6} align="center">No completed orders found</TableCell>
               </TableRow>
             ) : (
-              activeOrders.map((order) => (
+              recentOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>{order.id}</TableCell>
                   <TableCell>{order.customer?.name || 'Unknown'}</TableCell>
@@ -200,15 +199,7 @@ function RiderHome() {
                   <TableCell>{order.dropoff_location}</TableCell>
                   <TableCell>KES {order.amount}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      size="small"
-                      onClick={() => handleCompleteOrder(order.id)}
-                      disabled={loading}
-                    >
-                      Complete
-                    </Button>
+                    {new Date(order.created_at).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))
@@ -220,4 +211,4 @@ function RiderHome() {
   );
 }
 
-export default RiderHome; 
+export default RiderEarnings; 
