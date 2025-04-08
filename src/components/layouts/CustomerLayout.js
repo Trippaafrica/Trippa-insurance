@@ -9,6 +9,7 @@ import {
   Toolbar,
   Typography,
   Badge,
+  Avatar,
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -20,7 +21,7 @@ import { useAuth } from '../../context/AuthContext';
 
 function CustomerLayout() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const [value, setValue] = React.useState(0);
 
   const handleNavigation = (event, newValue) => {
@@ -44,19 +45,50 @@ function CustomerLayout() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static" color="primary">
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+      <AppBar 
+        position="static" 
+        color="primary"
+        elevation={0}
+        sx={{
+          borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+        }}
+      >
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography 
+            variant="h6" 
+            component="div" 
+            sx={{ 
+              flexGrow: 1,
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+            }}
+          >
             Trippa
           </Typography>
-          <IconButton color="inherit" onClick={signOut}>
-            <ProfileIcon />
+          <IconButton 
+            color="inherit" 
+            onClick={signOut}
+            sx={{ p: 0 }}
+          >
+            <Avatar 
+              src={user?.user_metadata?.avatar_url}
+              sx={{ width: 32, height: 32 }}
+            >
+              {user?.user_metadata?.full_name?.[0] || 'U'}
+            </Avatar>
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 2 }}>
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          p: 2,
+          pb: 8, // Add padding for bottom navigation
+        }}
+      >
         <Outlet />
       </Box>
 
@@ -70,10 +102,29 @@ function CustomerLayout() {
           left: 0,
           right: 0,
           borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+          bgcolor: 'background.paper',
+          '& .MuiBottomNavigationAction-root': {
+            minWidth: 'auto',
+            padding: '6px 12px',
+          },
+          '& .MuiBottomNavigationAction-label': {
+            fontSize: '0.75rem',
+            '&.Mui-selected': {
+              fontSize: '0.75rem',
+            },
+          },
         }}
       >
-        <BottomNavigationAction label="Home" icon={<HomeIcon />} />
-        <BottomNavigationAction label="Orders" icon={<OrdersIcon />} />
+        <BottomNavigationAction 
+          label="Home" 
+          icon={<HomeIcon />} 
+          sx={{ color: 'text.secondary' }}
+        />
+        <BottomNavigationAction 
+          label="Orders" 
+          icon={<OrdersIcon />} 
+          sx={{ color: 'text.secondary' }}
+        />
         <BottomNavigationAction
           label="Cart"
           icon={
@@ -81,8 +132,13 @@ function CustomerLayout() {
               <CartIcon />
             </Badge>
           }
+          sx={{ color: 'text.secondary' }}
         />
-        <BottomNavigationAction label="Profile" icon={<ProfileIcon />} />
+        <BottomNavigationAction 
+          label="Profile" 
+          icon={<ProfileIcon />} 
+          sx={{ color: 'text.secondary' }}
+        />
       </BottomNavigation>
     </Box>
   );
