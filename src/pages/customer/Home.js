@@ -12,7 +12,7 @@ import {
   Chip,
   CircularProgress,
 } from '@mui/material';
-import { Search as SearchIcon, AddShoppingCart, Remove } from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
 import { supabase } from '../../utils/supabaseClient';
 
 function CustomerHome() {
@@ -21,7 +21,6 @@ function CustomerHome() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [cart, setCart] = useState([]);
 
   const fetchProducts = useCallback(async () => {
     try {

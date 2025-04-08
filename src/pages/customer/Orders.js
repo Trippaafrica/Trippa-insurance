@@ -10,7 +10,6 @@ import {
   TableHead,
   TableRow,
   Chip,
-  Button,
 } from '@mui/material';
 import { supabase } from '../../utils/supabaseClient';
 
