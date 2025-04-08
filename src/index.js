@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { AuthProvider } from './context/AuthContext';
 import App from './App';
-import './styles/index.css';
+import { BrowserRouter } from 'react-router-dom';
 
 // Add error boundary
 class ErrorBoundary extends React.Component {
@@ -22,9 +21,31 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <h1>Something went wrong.</h1>
-          <p>Please try refreshing the page.</p>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100vh',
+          padding: '20px',
+          textAlign: 'center'
+        }}>
+          <h1>Something went wrong</h1>
+          <p>Please try refreshing the page</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 20px',
+              marginTop: '20px',
+              backgroundColor: '#FF6B00',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Refresh Page
+          </button>
         </div>
       );
     }
@@ -37,9 +58,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <AuthProvider>
+      <BrowserRouter>
         <App />
-      </AuthProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   </React.StrictMode>
 ); 
