@@ -10,8 +10,8 @@ import {
   TableHead,
   TableRow,
   Chip,
+  Button,
 } from '@mui/material';
-import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../utils/supabaseClient';
 
 function CustomerOrders() {

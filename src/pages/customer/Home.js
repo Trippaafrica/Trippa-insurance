@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Grid,
@@ -12,7 +12,7 @@ import {
   Chip,
   CircularProgress,
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
+import { Search as SearchIcon, AddShoppingCart, Remove } from '@mui/icons-material';
 import { supabase } from '../../utils/supabaseClient';
 
 function CustomerHome() {
@@ -21,17 +21,14 @@ function CustomerHome() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, [fetchProducts]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       let query = supabase
         .from('products')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (selectedCategory) {
         query = query.eq('category_id', selectedCategory);
@@ -49,7 +46,7 @@ function CustomerHome() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory, searchQuery]);
 
   const fetchCategories = async () => {
     try {
@@ -72,6 +69,11 @@ function CustomerHome() {
     setSelectedCategory(categoryId);
     fetchProducts();
   };
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, [fetchProducts, fetchCategories]);
 
   if (loading) {
     return (

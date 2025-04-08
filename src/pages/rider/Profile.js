@@ -6,9 +6,7 @@ import {
   TextField,
   Button,
   Avatar,
-  Grid,
 } from '@mui/material';
-import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../utils/supabaseClient';
 
 function RiderProfile() {
