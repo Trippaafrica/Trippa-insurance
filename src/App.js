@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, CircularProgress } from '@mui/material';
@@ -134,32 +134,30 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          {/* Customer Routes */}
-          <Route path="/customer" element={user?.user_metadata?.user_type === 'customer' ? <CustomerLayout /> : <Navigate to="/customer/login" />}>
-            <Route index element={<CustomerHome />} />
-            <Route path="profile" element={<CustomerProfile />} />
-            <Route path="orders" element={<CustomerOrders />} />
-            <Route path="cart" element={<CustomerCart />} />
-          </Route>
-          <Route path="/customer/login" element={!user ? <CustomerLogin /> : <Navigate to="/customer" />} />
-          <Route path="/customer/register" element={!user ? <CustomerRegister /> : <Navigate to="/customer" />} />
+      <Routes>
+        {/* Customer Routes */}
+        <Route path="/customer" element={user?.user_metadata?.user_type === 'customer' ? <CustomerLayout /> : <Navigate to="/customer/login" />}>
+          <Route index element={<CustomerHome />} />
+          <Route path="profile" element={<CustomerProfile />} />
+          <Route path="orders" element={<CustomerOrders />} />
+          <Route path="cart" element={<CustomerCart />} />
+        </Route>
+        <Route path="/customer/login" element={!user ? <CustomerLogin /> : <Navigate to="/customer" />} />
+        <Route path="/customer/register" element={!user ? <CustomerRegister /> : <Navigate to="/customer" />} />
 
-          {/* Rider Routes */}
-          <Route path="/rider" element={user?.user_metadata?.user_type === 'rider' ? <RiderLayout /> : <Navigate to="/rider/login" />}>
-            <Route index element={<RiderHome />} />
-            <Route path="profile" element={<RiderProfile />} />
-            <Route path="orders" element={<RiderOrders />} />
-            <Route path="earnings" element={<RiderEarnings />} />
-          </Route>
-          <Route path="/rider/login" element={!user ? <RiderLogin /> : <Navigate to="/rider" />} />
-          <Route path="/rider/register" element={!user ? <RiderRegister /> : <Navigate to="/rider" />} />
+        {/* Rider Routes */}
+        <Route path="/rider" element={user?.user_metadata?.user_type === 'rider' ? <RiderLayout /> : <Navigate to="/rider/login" />}>
+          <Route index element={<RiderHome />} />
+          <Route path="profile" element={<RiderProfile />} />
+          <Route path="orders" element={<RiderOrders />} />
+          <Route path="earnings" element={<RiderEarnings />} />
+        </Route>
+        <Route path="/rider/login" element={!user ? <RiderLogin /> : <Navigate to="/rider" />} />
+        <Route path="/rider/register" element={!user ? <RiderRegister /> : <Navigate to="/rider" />} />
 
-          {/* Default Route */}
-          <Route path="/" element={<Navigate to="/customer" />} />
-        </Routes>
-      </Router>
+        {/* Default Route */}
+        <Route path="/" element={<Navigate to="/customer" />} />
+      </Routes>
     </ThemeProvider>
   );
 }
