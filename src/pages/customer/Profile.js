@@ -9,7 +9,7 @@ import {
   Grid,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../utils/supabaseClient';
 
 const Profile = () => {
   const { user } = useAuth();
