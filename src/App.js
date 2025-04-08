@@ -113,6 +113,7 @@ function App() {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        console.log('Initializing auth...');
         // Check for existing session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
@@ -120,11 +121,13 @@ function App() {
           console.error('Session error:', sessionError);
           setError(sessionError.message);
         } else {
+          console.log('Session:', session ? 'Present' : 'None');
           setUser(session?.user ?? null);
         }
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          console.log('Auth state changed:', _event, session ? 'User present' : 'No user');
           setUser(session?.user ?? null);
         });
 
