@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, TextField, Button, Avatar } from '@mui/material';
-import { supabase } from '../../utils/supabaseClient';
+import {
+  Box,
+  Typography,
+  Paper,
+  TextField,
+  Button,
+  Avatar,
+  Grid,
+} from '@mui/material';
+import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../supabaseClient';
 
 function RiderProfile() {
   const [profile, setProfile] = useState({

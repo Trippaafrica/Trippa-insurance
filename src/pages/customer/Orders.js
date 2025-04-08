@@ -11,7 +11,8 @@ import {
   TableRow,
   Chip,
 } from '@mui/material';
-import { supabase } from '../../utils/supabaseClient';
+import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../supabaseClient';
 
 function CustomerOrders() {
   const [orders, setOrders] = useState([]);
