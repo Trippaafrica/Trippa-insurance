@@ -48,7 +48,7 @@ function CustomerHome() {
     }
   }, [selectedCategory, searchQuery]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('categories')
@@ -58,7 +58,7 @@ function CustomerHome() {
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
-  };
+  }, []);
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
